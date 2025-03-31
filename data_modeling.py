@@ -1,11 +1,5 @@
 class MaxCoveringProblem:
     def __init__(self, file_path, k=None):
-        """
-        Initialize the Max Covering Problem instance using an SCP file.
-
-        :param file_path: Path to the SCP data file.
-        :param k: Number of subsets to select (default: set dynamically).
-        """
         self.file_path = file_path
         self.universe, self.subsets = self.load_data()
         self.n = len(self.subsets)  # Number of subsets
@@ -38,10 +32,3 @@ class MaxCoveringProblem:
             i = j
 
         return universe, subsets
-        
-
-
-# Example usage:
-file_path = "./test/4/scp41.txt"  # Replace with your actual SCP file
-mcp = MaxCoveringProblem(file_path)
-print(f"Value of k: {mcp.k}")
