@@ -11,7 +11,7 @@ def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
 def pso(mcp, w, c1, c2, num_iterations):
-    num_particles = 2 * mcp.n
+    num_particles = 20 * mcp.n
     subsets_size = mcp.n
 
     particles = np.random.choice([0, 1], size=(num_particles, subsets_size))  # Random 0/1 solutions
@@ -33,13 +33,20 @@ def pso(mcp, w, c1, c2, num_iterations):
             
             probabilities = sigmoid(velocities[i])
             particles[i] = np.where(np.random.rand(subsets_size) < probabilities, 1, 0)
-            
-            if sum(particles[i]) > mcp.k:
+            selected_count = sum(particles[i])
+
+            if selected_count > mcp.k:
                 excess = sum(particles[i]) - mcp.k
                 ones_indices = np.where(particles[i] == 1)[0]
                 np.random.shuffle(ones_indices)
                 particles[i][ones_indices[:excess]] = 0  # Remove excess subsets
-            
+            elif selected_count < mcp.k:
+                deficit = mcp.k - selected_count
+                zeros_indices = np.where(particles[i] == 0)[0]
+                np.random.shuffle(zeros_indices)
+                particles[i][zeros_indices[:deficit]] = 1  # Add missing subsets
+
+
             score = fitness(particles[i], mcp)
             if score > personal_best_scores[i]:
                 personal_best[i] = particles[i].copy()
@@ -57,9 +64,9 @@ def pso(mcp, w, c1, c2, num_iterations):
 
 if __name__ == "__main__":
     mcp = MaxCoveringProblem('./test/4/scp41.txt')
-    w = 0.9  # Inertia weight
-    c1 = 2.0  # Cognitive component
-    c2 = 1.0  # Social component
+    w = 0.5  # Inertia weight
+    c1 = 1.5  # Cognitive component
+    c2 = 1.5  # Social component
     num_iterations = 100  # Number of iterations
     best_solution, best_score = pso(mcp, w, c1, c2, num_iterations)
     print("Final Best Solution:", best_solution)
